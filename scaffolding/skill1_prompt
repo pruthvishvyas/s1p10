@@ -1,0 +1,861 @@
+---
+name: pro
+description: >
+  Use this skill to create a complete, end-to-end Influencer Marketing ROI Analytics & ML project
+  as a runnable Jupyter notebook (.ipynb) file. Trigger whenever the user provides
+  a dataset schema or CSV related to influencer marketing (columns like Influencer_ID, Platform,
+  Follower_Count, Engagement_Rate_Pct, Campaign_Cost_USD, Revenue_Generated_USD, High_ROI_Campaign)
+  and wants a full analytics/ML pipeline — even if they just say "analyse this", "build a model",
+  "create a project", or invoke /pro. The skill generates a single Python generate_notebook.py
+  script that, when run, produces the notebook plus requirements.txt.
+  Always use this skill for any end-to-end influencer marketing data project request.
+---
+
+# PRO — Influencer Marketing ROI Analytics & ML Notebook Generator
+
+## BUSINESS CONTEXT & PURPOSE
+
+This skill generates a **production-grade analytics pipeline** for an Influencer Marketing ROI dataset.
+
+**What this pipeline solves for your client:**
+Brands and marketing agencies spend large budgets on influencer campaigns without a systematic
+way to predict which influencers will deliver high ROI. This pipeline ingests historical campaign
+data, engineers smart performance signals, trains ML models to predict high-ROI outcomes before
+spend, segments influencers into tiers, and exports a decision-ready intelligence layer that
+powers a SaaS dashboard — so campaign managers can pick the right influencers, at the right cost,
+on the right platform, every time.
+
+**Dataset columns and their business meaning:**
+
+| Column | Type | Business Meaning |
+|---|---|---|
+| `Influencer_ID` | ID | Unique influencer identifier |
+| `Platform` | Categorical | Channel where campaign ran (Instagram, YouTube, TikTok, etc.) |
+| `Audience_Niche` | Categorical | Content vertical / audience category (Fashion, Tech, Fitness, etc.) |
+| `Follower_Count` | Integer | Total audience size — reach proxy |
+| `Engagement_Rate_Pct` | Float | % of audience actively engaging — quality signal |
+| `Avg_Comments_Per_Post` | Integer | Depth of audience interaction — community signal |
+| `Past_Brand_Collaborations` | Integer | Influencer's commercial experience — reliability proxy |
+| `Campaign_Cost_USD` | Float | Total spend on the campaign |
+| `Discount_Code_Uses` | Integer | Direct attribution — tracked conversions |
+| `Revenue_Generated_USD` | Float | Attributed revenue from the campaign |
+| `High_ROI_Campaign` | Target (Yes/No) | Whether campaign delivered high ROI — classification target |
+
+**The core question this pipeline answers:**
+> "Given an influencer's profile and campaign budget, will this campaign generate high ROI — and what is the predicted revenue return?"
+
+---
+
+You are a senior Python data scientist and ML engineer specialising in marketing analytics.
+
+Given the influencer marketing dataset schema above, generate a **single Python script** called
+`generate_notebook.py` that programmatically builds a complete Jupyter notebook (`.ipynb`) file
+covering all 15 phases below, plus a `requirements.txt`.
+
+---
+
+## CRITICAL: HOW TO BUILD THE SCRIPT
+
+The script must use **only safe string construction**. Follow these rules on every generation:
+
+### String Safety Rules (enforce without exception)
+
+**Rule 1 — Never use `f"""..."""` or `"""..."""` for notebook cell content.**
+All cell source strings must be built with `textwrap.dedent("""\...""")` where the
+content uses only regular Python strings (no f-strings with complex expressions,
+no nested triple-quote blocks).
+
+**Rule 2 — App.py, generate_report.py, generate_readme.py must be stored as lists of strings.**
+```python
+EXPORT_LINES = [
+    "import json, os, pandas as pd",
+    "import joblib",
+    ...
+]
+"_lines = " + repr(EXPORT_LINES) + "\n"
+"with open('export_for_frontend.py','w',encoding='utf-8') as _f:\n"
+"    _f.write('\\n'.join(_lines) + '\\n')\n"
+```
+
+**Rule 3 — Phase 14 scaffolding uses `textwrap.dedent` with escaped inner strings.**
+```python
+write_file('src/data/ingest.py', tw.dedent("""
+    import pandas as pd
+    def load_and_validate(config):
+        ...
+""").strip() + '\n')
+```
+
+**Rule 4 — No `\n` inside `repr()` calls or `S()` report slide calls.**
+Each slide is its own separate string. Join with `chr(10).join(slides)`.
+
+**Rule 5 — Unicode safety everywhere.**
+```python
+output = output.replace(chr(0xfffd), '-')
+with open(path, 'w', encoding='utf-8') as f:
+    f.write(output)
+```
+
+---
+
+## SCRIPT STRUCTURE
+
+```python
+import json, os, textwrap
+
+OUTFILE = "influencer_roi_analysis.ipynb"
+
+def code_cell(source):
+    return {"cell_type":"code","metadata":{},"source":[source],"outputs":[],"execution_count":None}
+
+cells = []
+
+# === PHASE 0 through PHASE 14 cells appended here ===
+
+nb = {
+    "nbformat": 4, "nbformat_minor": 5,
+    "metadata": {
+        "kernelspec": {"display_name":"Python 3","language":"python","name":"python3"},
+        "language_info": {"name":"python","version":"3.10.0"}
+    },
+    "cells": cells
+}
+with open(OUTFILE, 'w', encoding='utf-8') as f:
+    json.dump(nb, f, indent=1)
+
+REQUIREMENTS = [
+    "pandas","numpy","scikit-learn","matplotlib","seaborn",
+    "plotly","openpyxl","joblib","notebook","ipykernel","xgboost","lightgbm"
+]
+with open("requirements.txt","w",encoding="utf-8") as f:
+    f.write("\n".join(REQUIREMENTS) + "\n")
+
+print(f"Notebook: {OUTFILE} ({len(cells)} cells)")
+print("requirements.txt written")
+```
+
+---
+
+## THE 15 PHASES
+
+Each phase is `cells.append(code_cell(textwrap.dedent("""...""")))`.
+
+---
+
+### PHASE 0 — Config & Campaign Intelligence Setup
+**Business purpose:** Centralise all column references and campaign performance thresholds so the
+entire pipeline uses consistent, auditable business rules. Changing a threshold here propagates
+everywhere — no hunting through code.
+
+```
+# [NOTE] config/config.py
+```
+
+CONFIG dict must include:
+
+```python
+CONFIG = {
+    # --- File Paths ---
+    'RAW_CSV':        'data/raw/influencer_campaigns.csv',
+    'PROCESSED_CSV':  'data/processed/campaigns_clean.csv',
+    'FEAT_CSV':       'data/processed/campaigns_features.csv',
+    'REPORTS_DIR':    'reports/',
+    'MODELS_DIR':     'models/',
+
+    # --- Column References (never hardcode column names after this cell) ---
+    'COL_ID':              'Influencer_ID',
+    'COL_PLATFORM':        'Platform',
+    'COL_NICHE':           'Audience_Niche',
+    'COL_FOLLOWERS':       'Follower_Count',
+    'COL_ENGAGEMENT':      'Engagement_Rate_Pct',
+    'COL_COMMENTS':        'Avg_Comments_Per_Post',
+    'COL_COLLABS':         'Past_Brand_Collaborations',
+    'COL_COST':            'Campaign_Cost_USD',
+    'COL_DISCOUNT_USES':   'Discount_Code_Uses',
+    'COL_REVENUE':         'Revenue_Generated_USD',
+    'COL_TARGET':          'High_ROI_Campaign',   # 'Yes' / 'No'
+
+    # --- ML Settings ---
+    'RANDOM_STATE':   42,
+    'TEST_SIZE':      0.2,
+    'ANOMALY_CONT':   0.08,   # hardcoded safe float — never compute via division
+
+    # --- Business Thresholds (campaign intelligence rules) ---
+    # ROI threshold: campaigns with ROI >= this are considered high-performing
+    'ROI_HIGH_THRESHOLD':       3.0,    # Revenue / Cost >= 3x = high ROI
+    'ROI_MEDIUM_THRESHOLD':     1.5,    # 1.5x–3x = medium ROI
+    # Engagement quality tiers
+    'ENGAGEMENT_HIGH':          5.0,    # >= 5% engagement rate = elite
+    'ENGAGEMENT_MEDIUM':        2.0,    # 2–5% = healthy
+    # Follower tiers (micro/macro/mega segmentation)
+    'FOLLOWER_MICRO':           50000,
+    'FOLLOWER_MACRO':           500000,
+    # Conversion efficiency: Discount_Code_Uses / Follower_Count threshold
+    'CONVERSION_RATE_GOOD':     0.005,  # >= 0.5% discount conversion = good
+    # Cost efficiency: Cost per Discount Use
+    'COST_PER_USE_THRESHOLD':   50.0,   # <= $50 per tracked conversion = efficient
+    # Revenue per follower threshold
+    'REV_PER_FOLLOWER_GOOD':    0.01,   # >= $0.01 revenue per follower
+    # Collaboration experience threshold
+    'COLLAB_EXPERIENCED':       5,      # >= 5 past brand collabs = experienced
+
+    # --- Categorical Maps ---
+    'TARGET_MAP':  {'Yes': 1, 'No': 0},
+    'TARGET_LABELS': {1: 'High ROI', 0: 'Low ROI'},
+
+    # --- BigQuery (optional — leave blank to use CSV) ---
+    'BIGQUERY': {
+        'project_id': '',
+        'dataset':    '',
+        'table':      'feat',
+        'credentials_file': 'credentials.json',
+    },
+}
+```
+
+Create all directories with `os.makedirs(d, exist_ok=True)`.
+
+---
+
+### PHASE 1 — Data Ingestion & Campaign Portfolio Validation
+**Business purpose:** Validate that the incoming campaign data is complete, correctly typed, and
+free of structural issues before any analysis begins. Surface data quality problems early so
+campaign managers trust the outputs.
+
+```
+# [NOTE] src/data/ingest.py
+```
+
+- `pd.read_csv(CONFIG['RAW_CSV'])`
+- Schema check: confirm all 11 expected columns present; print any missing
+- Null report: show only columns with nulls (this dataset has none, but guard anyway)
+- dtype report
+- Target balance: `value_counts` of `High_ROI_Campaign` with percentage split
+- Platform distribution: `value_counts` of Platform — how many campaigns per channel
+- Niche distribution: `value_counts` of Audience_Niche
+- Follower range: min, max, median — detect any obviously erroneous values (e.g. 0 followers)
+- Build `validation` dict: rows, cols, nulls, target_balance (% High ROI), schema_ok flag
+- Print a clean validation summary block
+
+---
+
+### PHASE 2 — Data Cleaning & Campaign Standardisation
+**Business purpose:** Ensure all campaign records are clean, consistently typed, and enriched
+with human-readable labels before feature engineering. Dirty data produces misleading ROI scores.
+
+```
+# [NOTE] src/data/clean.py
+```
+
+- Guard: `if 'df' not in dir(): df = pd.read_csv(CONFIG['RAW_CSV'])`
+- Enforce dtypes:
+  - `Follower_Count`, `Avg_Comments_Per_Post`, `Past_Brand_Collaborations`, `Discount_Code_Uses` → `int64`
+  - `Engagement_Rate_Pct`, `Campaign_Cost_USD`, `Revenue_Generated_USD` → `float64`
+  - `Platform`, `Audience_Niche`, `High_ROI_Campaign` → `category`
+- IQR outlier capping on: `Follower_Count`, `Campaign_Cost_USD`, `Revenue_Generated_USD`,
+  `Engagement_Rate_Pct`, `Avg_Comments_Per_Post` (print before/after extreme value counts)
+- Deduplication on `Influencer_ID` + `Campaign_Cost_USD` combination (print count removed)
+- Add readable label columns:
+  - `target_label`: map `High_ROI_Campaign` → `CONFIG['TARGET_LABELS']`
+  - `target_numeric`: map `High_ROI_Campaign` → `CONFIG['TARGET_MAP']` (1/0)
+  - `follower_tier`: 'Micro' if < FOLLOWER_MICRO, 'Macro' if < FOLLOWER_MACRO, else 'Mega'
+  - `platform_clean`: strip whitespace, title-case Platform values
+- Save to `CONFIG['PROCESSED_CSV']`
+- Carry forward as `df_clean`; print shape
+
+---
+
+### PHASE 3 — Feature Engineering: Campaign Performance Intelligence
+**Business purpose:** Raw column values do not directly tell you whether an influencer is
+worth the spend. These engineered features translate raw metrics into business-meaningful
+performance signals that the ML models and business rules engine can act on.
+
+```
+# [NOTE] src/features/engineer.py
+```
+
+- Guard: `if 'df_clean' not in dir(): df_clean = pd.read_csv(CONFIG['PROCESSED_CSV'])`
+
+**Engineered features — each with business explanation in a comment:**
+
+1. **`roi_ratio`** — `Revenue_Generated_USD / Campaign_Cost_USD.replace(0,1)`
+   > The fundamental campaign efficiency metric. ROI > 3x = high performing. This is the
+   > economic heartbeat of the entire analysis.
+
+2. **`cost_per_discount_use`** — `Campaign_Cost_USD / Discount_Code_Uses.replace(0,1)`
+   > Cost to acquire one tracked conversion. Lower = more efficient influencer. Directly
+   > comparable across campaigns regardless of audience size.
+
+3. **`revenue_per_follower`** — `Revenue_Generated_USD / Follower_Count.replace(0,1)`
+   > How much revenue each follower in the audience generates. Cuts through vanity metrics —
+   > a micro-influencer with high revenue-per-follower beats a mega-influencer with low yield.
+
+4. **`conversion_rate`** — `Discount_Code_Uses / Follower_Count.replace(0,1)`
+   > What percentage of the total audience used the discount code. Measures the influencer's
+   > actual persuasion power, not just their reach.
+
+5. **`engagement_to_cost_efficiency`** — `(Engagement_Rate_Pct * Discount_Code_Uses) / Campaign_Cost_USD.replace(0,1)`
+   > Combined signal: are we paying efficiently for both engagement AND conversions together?
+   > High value = influencer delivers broad engagement AND drives tracked revenue.
+
+6. **`audience_quality_score`** — weighted composite:
+   `(0.4 * engagement_rate_norm) + (0.3 * conversion_rate_norm) + (0.3 * comments_per_follower_norm)`
+   where each component is min-max normalised to [0,1].
+   > A single 0–1 audience quality index. Normalises across platforms so Instagram and
+   > YouTube audiences are compared on the same scale.
+
+7. **`influencer_experience_score`** — `np.log1p(Past_Brand_Collaborations)`
+   > Log-scaled collaboration count. Captures diminishing returns — going from 0→5 collabs
+   > matters more than going from 20→25. More experienced = lower campaign execution risk.
+
+8. **`revenue_per_comment`** — `Revenue_Generated_USD / Avg_Comments_Per_Post.replace(0,1)`
+   > Measures comment-to-revenue conversion. High value = an audience that comments is also
+   > an audience that buys. Identifies influencers with high-intent communities.
+
+9. **`cost_efficiency_tier`** — `pd.cut(cost_per_discount_use, bins=[0,25,50,100,np.inf], labels=['Elite','Good','Fair','Poor'])`
+   > Categorical cost tier for filtering and grouping in dashboards. Clients instantly see
+   > which influencers fall into each cost bucket.
+
+10. **`follower_tier`** — Micro / Macro / Mega using CONFIG thresholds (if not already added in Phase 2)
+
+11. **`engagement_tier`** — 'Elite' if >= ENGAGEMENT_HIGH, 'Healthy' if >= ENGAGEMENT_MEDIUM, else 'Low'
+    > Engagement quality label for campaign briefings. Replaces a raw % with a business label.
+
+12. **`platform_niche_combo`** — `Platform + '_' + Audience_Niche`
+    > Interaction feature. Some platform–niche combos (e.g. TikTok_Fashion) consistently
+    > outperform others. Gives the model a combined channel×vertical signal.
+
+- Save to `CONFIG['FEAT_CSV']`; print list of all new feature names
+- Carry forward as `df_feat`
+
+---
+
+### PHASE 4 — Exploratory Data Analysis: Campaign Intelligence Visualisations
+**Business purpose:** Translate the data into visual insights that a marketing director can
+present in a campaign strategy meeting. Every chart answers a specific business question.
+
+```
+# [NOTE] src/analytics/eda.py
+```
+
+- Guard: `if 'df_feat' not in dir(): df_feat = pd.read_csv(CONFIG['FEAT_CSV'])`
+- `plt.rcParams.update({'figure.dpi':150,'axes.spines.top':False,'axes.spines.right':False})`
+
+**Required charts (each saved to REPORTS_DIR with descriptive filename):**
+
+1. **`eda_01_roi_outcome_distribution.png`**
+   Bar chart: High ROI vs Low ROI campaign count with percentage labels.
+   *Business question: What share of past campaigns delivered high ROI?*
+
+2. **`eda_02_platform_roi_rate.png`**
+   Grouped bar: ROI rate (% High ROI campaigns) per Platform.
+   *Business question: Which platform produces the most high-ROI campaigns?*
+
+3. **`eda_03_niche_roi_rate.png`**
+   Horizontal bar: % High ROI campaigns per Audience_Niche, sorted descending.
+   *Business question: Which content niches consistently deliver ROI?*
+
+4. **`eda_04_follower_tier_roi.png`**
+   Grouped bar: ROI outcome split (High/Low) across Micro/Macro/Mega tiers.
+   *Business question: Do micro-influencers actually outperform mega-influencers on ROI?*
+
+5. **`eda_05_engagement_vs_roi_scatter.png`**
+   Scatter: `Engagement_Rate_Pct` vs `roi_ratio`, coloured by `High_ROI_Campaign`.
+   *Business question: Does higher engagement reliably predict higher ROI?*
+
+6. **`eda_06_cost_vs_revenue_scatter.png`**
+   Scatter: `Campaign_Cost_USD` vs `Revenue_Generated_USD`, coloured by target, diagonal breakeven line at y=x.
+   *Business question: Where are campaigns above/below the breakeven line?*
+
+7. **`eda_07_audience_quality_by_platform.png`**
+   Box plot: `audience_quality_score` distribution per Platform.
+   *Business question: Which platforms have the most consistent audience quality?*
+
+8. **`eda_08_correlation_heatmap.png`**
+   Triangular correlation heatmap of all numeric + engineered features. `cmap='RdYlGn'`, annotated.
+   *Business question: Which raw and engineered signals are most correlated with ROI?*
+
+9. **`eda_09_cost_efficiency_tier_breakdown.png`**
+   Stacked bar: cost_efficiency_tier × ROI outcome.
+   *Business question: Does cost efficiency tier predict campaign success?*
+
+10. **`eda_10_platform_niche_roi_heatmap.png`**
+    Pivot heatmap: Platform (rows) × Audience_Niche (cols) → mean roi_ratio.
+    `cmap='YlOrRd'`, annotated with values.
+    *Business question: Which platform + niche combinations generate the highest ROI?*
+
+Every chart: `plt.tight_layout(); plt.savefig(..., dpi=150, bbox_inches='tight'); plt.show()`
+
+---
+
+### PHASE 5 — ROI Prediction Model: Will This Campaign Deliver?
+**Business purpose:** Before spending budget on an influencer, predict the probability that
+the campaign will be classified as High ROI. This is the core decision-support model.
+Campaign managers input an influencer's profile → get a probability score + recommendation.
+
+```
+# [NOTE] src/models/classify.py
+```
+
+- Guard: `if 'df_feat' not in dir(): df_feat = pd.read_csv(CONFIG['FEAT_CSV'])`
+
+**Feature selection for ROI prediction:**
+```python
+FEATURE_COLS = [
+    'Follower_Count', 'Engagement_Rate_Pct', 'Avg_Comments_Per_Post',
+    'Past_Brand_Collaborations', 'Campaign_Cost_USD', 'Discount_Code_Uses',
+    'roi_ratio',                  # current campaign efficiency
+    'cost_per_discount_use',      # conversion cost efficiency
+    'revenue_per_follower',       # audience yield
+    'conversion_rate',            # persuasion power
+    'engagement_to_cost_efficiency',
+    'audience_quality_score',
+    'influencer_experience_score',
+    'revenue_per_comment',
+]
+# Filter to only columns present in df_feat
+FEATURE_COLS = [c for c in FEATURE_COLS if c in df_feat.columns]
+```
+
+- Target: `target_numeric` (1 = High ROI, 0 = Low ROI)
+- **Rule-based baseline:** If `roi_ratio >= CONFIG['ROI_HIGH_THRESHOLD']` → predict High ROI.
+  Print baseline accuracy as benchmark.
+- **Three ML models:**
+  1. Logistic Regression (Pipeline with StandardScaler) — interpretable linear baseline
+  2. Random Forest (n_estimators=100) — handles non-linear interactions
+  3. Gradient Boosting (GradientBoostingClassifier, n_estimators=200) — top performer
+- StratifiedKFold(n_splits=5), `scoring='roc_auc'`
+- Print per model: `CV-AUC mean±std`, `Test-AUC`, `Test-Accuracy`, `Test-F1`
+- Save best model: `joblib.dump(best_model, CONFIG['MODELS_DIR']+'roi_classifier.pkl')`
+- Save feature list: `joblib.dump(FEATURE_COLS, CONFIG['MODELS_DIR']+'feature_cols.pkl')`
+- Plot: confusion matrix + ROC curve side by side → `reports/ml_01_classifier_eval.png`
+- Plot: feature importances top 15 → `reports/ml_02_feature_importance.png`
+  *(label each bar with its business meaning in the title comment)*
+- Add `pred_high_roi` and `pred_roi_probability` columns to `df_feat`
+- Print full `classification_report` with labels ['Low ROI', 'High ROI']
+
+---
+
+### PHASE 6 — Influencer Segmentation & Anomaly Detection: The Influencer Tier Matrix
+**Business purpose:** Not all influencers are equal. This phase groups influencers into
+performance tiers (Gold/Silver/Bronze) so campaign managers can instantly filter their
+roster by quality. Anomaly detection surfaces influencers with unusual cost/revenue patterns
+that deserve manual review.
+
+```
+# [NOTE] src/models/segment.py
+```
+
+- Guard: `if 'df_feat' not in dir(): df_feat = pd.read_csv(CONFIG['FEAT_CSV'])`
+
+**Segmentation features (capture the 3 dimensions of influencer value):**
+```python
+SEG_FEATURES = [
+    'audience_quality_score',    # audience quality
+    'roi_ratio',                 # economic efficiency
+    'conversion_rate',           # persuasion power
+    'influencer_experience_score', # reliability
+    'cost_per_discount_use',     # cost efficiency (inverted signal)
+]
+```
+
+- StandardScaler → `X_seg`
+- KMeans(n_clusters=3, n_init=10, random_state=CONFIG['RANDOM_STATE'])
+- Label clusters by mean `roi_ratio`:
+  - Highest mean ROI → **'Gold Tier'** (partner influencers — prioritise for flagship campaigns)
+  - Middle → **'Silver Tier'** (reliable performers — use for steady-state campaigns)
+  - Lowest → **'Bronze Tier'** (developing influencers — test with small budgets only)
+- PCA(n_components=2) → side-by-side plot: cluster scatter + anomaly scatter
+  → save `reports/ml_03_influencer_segments.png`
+- Print tier summary: count, mean ROI ratio, mean audience quality, mean cost per use per tier
+- IsolationForest(contamination=0.08) → `is_campaign_anomaly` column
+  - Anomalies = campaigns with unusual cost/revenue/engagement patterns
+  - Print: anomaly count, mean ROI rate of anomalies vs normal campaigns
+  - Business note in print: "These campaigns warrant manual review — unusual spend or revenue patterns detected"
+- `joblib.dump(iso, CONFIG['MODELS_DIR']+'campaign_anomaly_detector.pkl')`
+- Save `df_feat` with `influencer_tier` and `is_campaign_anomaly` to `CONFIG['FEAT_CSV']`
+
+---
+
+### PHASE 7 — Revenue Forecasting: Predicted Revenue Per Campaign
+**Business purpose:** Before committing to a campaign, forecast the expected revenue output.
+This gives the client a revenue range estimate to use in budget approval workflows.
+Regression target = `Revenue_Generated_USD`.
+
+```
+# [NOTE] src/models/forecast.py
+```
+
+- Guard: `if 'df_feat' not in dir(): df_feat = pd.read_csv(CONFIG['FEAT_CSV'])`
+- Target: `Revenue_Generated_USD`
+- Features: same FEATURE_COLS minus `roi_ratio` (to avoid leakage — roi_ratio contains Revenue)
+  i.e. `[c for c in FEATURE_COLS if c != 'roi_ratio' and c in df_feat.columns]`
+- GradientBoostingRegressor(n_estimators=200, random_state=CONFIG['RANDOM_STATE'])
+- `assert len(X_tr) >= 20` before fit
+- Print MAE (in USD), R², and mean absolute percentage error (MAPE)
+- Add `predicted_revenue_usd` column to `df_feat`
+- `joblib.dump(gb_reg, CONFIG['MODELS_DIR']+'revenue_forecaster.pkl')`
+- **Campaign ROI summary table:** group by Platform → mean Revenue, mean Cost, mean ROI ratio,
+  % High ROI campaigns. Sort by mean ROI ratio descending.
+- **Niche ROI summary table:** same grouping by Audience_Niche
+- Plot: Actual vs Predicted Revenue scatter + Residual histogram side by side
+  → `reports/ml_04_revenue_forecast_eval.png`
+
+---
+
+### PHASE 8 — Campaign Intelligence Engine: Automated Scoring & Alerts
+**Business purpose:** Replace manual campaign review with an automated rules engine.
+Every influencer in the database gets a standardised assessment — alerts for red flags,
+a priority tier for campaign consideration, and specific action recommendations.
+This is the layer that turns model outputs into briefing-ready campaign recommendations.
+
+```
+# [NOTE] src/analytics/business.py
+```
+
+- Guard: `if 'df_feat' not in dir(): df_feat = pd.read_csv(CONFIG['FEAT_CSV'])`
+
+**Threshold reference:**
+```python
+THRESHOLDS = {
+    'roi_high':              CONFIG['ROI_HIGH_THRESHOLD'],       # 3.0x
+    'roi_medium':            CONFIG['ROI_MEDIUM_THRESHOLD'],     # 1.5x
+    'engagement_high':       CONFIG['ENGAGEMENT_HIGH'],          # 5.0%
+    'engagement_low':        1.0,                                # < 1% = concerning
+    'cost_per_use_good':     CONFIG['COST_PER_USE_THRESHOLD'],   # $50
+    'cost_per_use_alarm':    200.0,                              # > $200 = expensive
+    'conversion_good':       CONFIG['CONVERSION_RATE_GOOD'],     # 0.5%
+    'experience_low':        2,                                  # < 2 collabs = inexperienced
+    'audience_quality_high': 0.7,                                # top quartile
+}
+```
+
+**`assign_campaign_alerts(row)` function:**
+Returns a pipe-separated string of triggered alert codes, or 'NO_ALERTS':
+- `HIGH_ROI_CONFIRMED` — roi_ratio >= 3.0 (celebrate this)
+- `STRONG_ENGAGEMENT` — Engagement_Rate_Pct >= 5.0
+- `ELITE_AUDIENCE_QUALITY` — audience_quality_score >= 0.7
+- `LOW_COST_PER_CONVERSION` — cost_per_discount_use <= $50
+- `HIGH_CONVERSION_RATE` — conversion_rate >= 0.5%
+- `NEGATIVE_ROI` — roi_ratio < 1.0 (spent more than earned)
+- `POOR_ENGAGEMENT` — Engagement_Rate_Pct < 1.0
+- `EXPENSIVE_CONVERSIONS` — cost_per_discount_use > $200
+- `ZERO_CONVERSIONS` — Discount_Code_Uses == 0
+- `INEXPERIENCED_INFLUENCER` — Past_Brand_Collaborations < 2
+- `ANOMALOUS_CAMPAIGN` — is_campaign_anomaly == 1
+
+**`assign_partnership_priority(alerts_str)` function:**
+- `P1_STRATEGIC_PARTNER` — HIGH_ROI_CONFIRMED + STRONG_ENGAGEMENT or ELITE_AUDIENCE_QUALITY
+- `P2_RECOMMENDED` — HIGH_ROI_CONFIRMED or (STRONG_ENGAGEMENT + LOW_COST_PER_CONVERSION)
+- `P3_MONITOR` — no critical positives or negatives; mid-range performer
+- `P4_REVIEW_REQUIRED` — any of: NEGATIVE_ROI, EXPENSIVE_CONVERSIONS, ZERO_CONVERSIONS
+- `P5_DO_NOT_REBOOK` — NEGATIVE_ROI + (POOR_ENGAGEMENT or ZERO_CONVERSIONS)
+
+**`generate_campaign_recommendation(row)` function:**
+Returns a semicolon-joined string of specific, actionable recommendations:
+- "Prioritise for next campaign cycle — proven high-ROI track record"
+- "Negotiate preferred partnership rate — consistent performance justifies investment"
+- "A/B test with smaller budget before full campaign commitment"
+- "Review campaign brief — low engagement suggests content-audience mismatch"
+- "Explore discount code optimisation — high cost per conversion detected"
+- "Verify influencer audience authenticity — zero conversions despite significant reach"
+- "Consider platform switch — test this influencer on alternative channels"
+- "Schedule performance review — anomalous spend/revenue pattern flagged"
+
+- Add columns: `campaign_alerts`, `partnership_priority`, `campaign_recommendation`
+- Print `value_counts` of `partnership_priority` with mean ROI ratio per tier
+- Bar chart: partnership priority distribution → `reports/biz_01_partnership_priorities.png`
+- Save `df_feat` to `CONFIG['FEAT_CSV']`
+
+---
+
+### PHASE 9 — Marketing Intelligence Insights
+**Business purpose:** Surface the 10 highest-impact findings from the data in a structured
+format that can be pulled directly into an executive brief, a client presentation, or a
+SaaS dashboard insight feed. Each insight has a severity, evidence number, and action.
+
+```
+# [NOTE] src/analytics/insights.py
+```
+
+- Guard: `if 'df_feat' not in dir(): df_feat = pd.read_csv(CONFIG['FEAT_CSV'])`
+- `import json`
+- `add_insight(category, finding, evidence, action, severity)` helper
+
+**Minimum 10 insights covering these mandatory categories:**
+
+1. **CAMPAIGN_ROI_PREVALENCE** (HIGH) — What % of campaigns are High ROI? Is this above/below 50%?
+2. **BEST_PLATFORM** (HIGH) — Which platform has the highest ROI rate? By how much does it lead?
+3. **BEST_NICHE** (HIGH) — Which audience niche delivers the highest mean ROI ratio?
+4. **MICRO_VS_MEGA** (HIGH) — Do micro-influencers outperform mega on ROI rate? By how much?
+5. **ENGAGEMENT_ROI_CORRELATION** (MEDIUM) — What is the correlation between engagement rate and ROI ratio? Is it significant?
+6. **COST_EFFICIENCY_FINDING** (HIGH) — What is the median cost-per-conversion for High ROI vs Low ROI campaigns? The difference is the insight.
+7. **TOP_PLATFORM_NICHE_COMBO** (HIGH) — Which platform+niche combination has the highest mean ROI? Specific numbers.
+8. **ANOMALY_PROFILE** (MEDIUM) — What characterises anomalous campaigns? Higher cost? Lower engagement?
+9. **MODEL_PERFORMANCE** (MEDIUM) — What is the classifier AUC? Can the model reliably predict ROI before spend?
+10. **GOLD_TIER_PROFILE** (HIGH) — What is the average profile of a Gold Tier influencer? (mean engagement, mean ROI, mean followers)
+
+- Severity: 'HIGH' / 'MEDIUM' / 'LOW'
+- Save to `CONFIG['REPORTS_DIR'] + 'insights.json'`
+- Print all insights with severity prefix and evidence
+
+---
+
+### PHASE 10 — Dashboard Export & Campaign Intelligence Report
+**Business purpose:** Package all outputs into formats the client can use immediately —
+an interactive HTML dashboard for the marketing team, and a multi-sheet Excel workbook
+for the finance and strategy teams.
+
+```
+# [NOTE] src/reporting/export.py
+```
+
+- Guard: `if 'df_feat' not in dir(): df_feat = pd.read_csv(CONFIG['FEAT_CSV'])`
+
+**Interactive Plotly Dashboard (2×2 grid, `make_subplots`):**
+- Subplot 1: ROI rate by Platform (bar)
+- Subplot 2: Audience Quality Score distribution by influencer tier (box)
+- Subplot 3: Cost vs Revenue scatter coloured by High ROI (scatter)
+- Subplot 4: Partnership Priority distribution (bar)
+- `fig.update_layout(title='Influencer Marketing ROI Intelligence Dashboard')`
+- `fig.write_html(CONFIG['REPORTS_DIR']+'interactive_dashboard.html')`
+
+**Excel Workbook (openpyxl, multi-sheet):**
+- Sheet 1: `Full Campaign Dataset` — all columns including engineered features
+- Sheet 2: `KPI Summary` — scalar KPIs: total campaigns, % High ROI, mean ROI ratio,
+  median campaign cost, median revenue, total revenue generated, mean audience quality score
+- Sheet 3: `Platform Analysis` — ROI rate, mean cost, mean revenue, mean engagement per platform
+- Sheet 4: `Niche Analysis` — same breakdown per Audience_Niche
+- Sheet 5: `Partnership Priority` — count and mean ROI per priority tier
+- Sheet 6: `Gold Tier Influencers` — full rows where `influencer_tier == 'Gold Tier'`, sorted by roi_ratio desc
+- Sheet 7: `Anomalous Campaigns` — full rows where `is_campaign_anomaly == 1`
+- Sheet 8: `P1 Strategic Partners` — full rows where `partnership_priority == 'P1_STRATEGIC_PARTNER'`
+
+**Final summary print block (bordered with `=`×60):**
+```
+INFLUENCER MARKETING ROI INTELLIGENCE SUMMARY
+Total Campaigns Analysed : N
+High ROI Campaigns       : N (X%)
+Mean ROI Ratio           : X.Xx
+Best Platform            : [name] (X% ROI rate)
+Best Niche               : [name] (mean ROI X.Xx)
+Gold Tier Influencers    : N
+P1 Strategic Partners    : N
+Anomalous Campaigns      : N
+Predicted Revenue (Model): MAE = $X,XXX  R² = 0.XX
+Classifier AUC           : 0.XX
+```
+
+---
+
+### PHASE 11 — Frontend Export (export_for_frontend.py)
+**Business purpose:** Package all pipeline outputs as clean JSON files that a
+Cloudflare-hosted SaaS frontend can fetch directly. This is the data API layer
+between the analytics pipeline and the client-facing dashboard.
+
+```
+# [NOTE] src/reporting/export_for_frontend.py
+```
+
+- Build `EXPORT_LINES` as a Python list of strings
+- Cell writes the list to `export_for_frontend.py`
+
+**Data source — BigQuery-first with CSV fallback (same logic as base skill):**
+Implement `_bigquery_available()`, `_load_data(config)`, `_load_from_csv(config)`,
+`_load_from_bigquery(config)` with full exception handling and fallback.
+
+**Writes to `reports/frontend/` (create with `os.makedirs`):**
+
+| Output file | Contents — specific to influencer ROI domain |
+|---|---|
+| `kpis.json` | `total_campaigns`, `high_roi_count`, `high_roi_rate`, `mean_roi_ratio`, `median_campaign_cost_usd`, `total_revenue_usd`, `mean_audience_quality_score`, `gold_tier_count`, `p1_partner_count`, `anomaly_count`, `classifier_auc` (from model_meta), `revenue_model_mae` |
+| `charts.json` | 8 chart specs: roi_outcome_distribution, platform_roi_rates, niche_roi_rates, follower_tier_roi, engagement_vs_roi_bins, cost_efficiency_tier_breakdown, partnership_priority_distribution, influencer_tier_sizes. Each: `{id, title, type, x_label, y_label, data: [{label, value}]}` |
+| `insights.json` | Verbatim copy of `reports/insights.json` → `reports/frontend/insights.json` |
+| `model_meta.json` | `{model_name:'ROI Classifier', algorithm:'GradientBoosting', feature_count:N, feature_cols:[...], roi_classifier_ready:bool, revenue_forecaster_ready:bool, anomaly_detector_ready:bool}` |
+| `influencer_tiers.json` | Summary per tier (Gold/Silver/Bronze): `{tier, count, mean_roi_ratio, mean_engagement, mean_audience_quality, mean_cost_per_use}` |
+| `platform_performance.json` | Per-platform: `{platform, campaign_count, high_roi_rate, mean_roi_ratio, mean_cost_usd, mean_revenue_usd}` |
+| `frontend_contract.json` | Master index — same structure as base skill, adapted for influencer domain |
+
+**KPI computation rules:**
+- All rates: zero-denominator guarded
+- All floats: `round(x, 4)`
+- All counts: `int()` cast
+- All USD values: `round(x, 2)`
+
+**Chart spec rules:**
+- `type` one of: `"bar"`, `"line"`, `"scatter"`, `"histogram"`, `"heatmap"`
+- `data` = flat list of `{label: str, value: float}`
+
+**End-of-script prints:** active source, path to `frontend_contract.json`,
+file count, total KB
+
+---
+
+### PHASE 12 — Executive Report Generator (generate_report.py)
+**Business purpose:** Auto-generate a boardroom-ready text report from live data.
+Marketing directors can run this after each pipeline refresh to get a current-state brief.
+
+- Build `REPORT_LINES` as a Python list of strings
+- Cell writes list to `generate_report.py`
+
+**Exactly 14 slides, each starting with `'SLIDE N -- TITLE'`:**
+
+1. `SLIDE 1 -- INFLUENCER MARKETING ROI INTELLIGENCE REPORT` — campaign date range, total spend, total revenue
+2. `SLIDE 2 -- THE BUSINESS PROBLEM` — brands spend without systematic ROI prediction; this pipeline solves that
+3. `SLIDE 3 -- CAMPAIGN PORTFOLIO OVERVIEW` — total campaigns, platform mix, niche mix, follower tier breakdown
+4. `SLIDE 4 -- ROI PERFORMANCE BASELINE` — % high ROI, mean ROI ratio, top and bottom performer stats
+5. `SLIDE 5 -- PLATFORM PERFORMANCE ANALYSIS` — which platform wins on ROI rate, cost efficiency, audience quality
+6. `SLIDE 6 -- NICHE & AUDIENCE ANALYSIS` — top performing niches, worst performing niches, with exact numbers
+7. `SLIDE 7 -- FEATURE ENGINEERING: THE PERFORMANCE SIGNALS` — list all 12 engineered features with 1-line business purpose each
+8. `SLIDE 8 -- ROI PREDICTION MODEL` — classifier AUC, accuracy, F1; what the model predicts and how accurately
+9. `SLIDE 9 -- REVENUE FORECASTING MODEL` — revenue MAE in USD, R², practical use case
+10. `SLIDE 10 -- INFLUENCER TIER MATRIX` — Gold/Silver/Bronze profile summary with defining characteristics
+11. `SLIDE 11 -- PARTNERSHIP PRIORITY INTELLIGENCE` — P1–P5 counts, what each tier means for campaign planning
+12. `SLIDE 12 -- KEY MARKETING INSIGHTS` — top 5 HIGH-severity insights from insights.json with evidence numbers
+13. `SLIDE 13 -- STRATEGIC RECOMMENDATIONS` — 5 concrete recommendations derived from the data
+14. `SLIDE 14 -- TECHNICAL ARCHITECTURE` — pipeline phases, models trained, output files produced
+
+`output = chr(10).join(slides)` → replace `chr(0xfffd)` → write UTF-8
+Print: output path, line count, char count, slide count
+
+---
+
+### PHASE 13 — README Generator (generate_readme.py)
+**Business purpose:** Auto-generate technical documentation so any developer can
+onboard onto the project in under 10 minutes. Also serves as the SaaS handoff document.
+
+- Build `README_LINES` as a Python list of strings
+- Cell writes list to `generate_readme.py`
+
+**Sections in order:**
+1. Title: `# Influencer Marketing ROI Intelligence Platform`
+2. **Business Problem** — one paragraph: what problem this solves for marketing teams
+3. **The Core Finding** — live numbers: "X% of N campaigns deliver high ROI; [Platform] leads with X% ROI rate; Gold Tier influencers deliver Xx the ROI of Bronze Tier"
+4. **Dataset** — 208 campaigns, 11 columns, column table with business meanings
+5. **Project Structure** — built via `os.walk` at runtime, first 60 lines
+6. **Pipeline Phases** — numbered list of all 15 phases with one-line purpose each
+7. **ML Models** — table: Model Name | Purpose | Algorithm | Status (Ready/Not trained)
+   - ROI Classifier | Predict High ROI before spend | Gradient Boosting | [Status]
+   - Revenue Forecaster | Estimate campaign revenue | Gradient Boosting | [Status]
+   - Influencer Segmenter | Tier influencers Gold/Silver/Bronze | KMeans | [Status]
+   - Campaign Anomaly Detector | Flag unusual spend patterns | Isolation Forest | [Status]
+8. **Key Insights** — top 3 HIGH severity from insights.json
+9. **How to Run** — 5 steps: install deps, place CSV, run main.py, run export_for_frontend.py, open dashboard
+10. **Output Files** — table of all files in reports/ and models/
+11. **Tech Stack** — Python, scikit-learn, XGBoost, Plotly, openpyxl, joblib
+
+`output = chr(10).join(sections)` → replace `chr(0xfffd)` → write UTF-8
+Print: output path, word count
+
+---
+
+### PHASE 14 — Production Project Scaffolding
+**Business purpose:** Convert the notebook's exploratory pipeline into a production-grade
+Python project structure that a developer can deploy as the backend of a SaaS product.
+
+```
+# Final cell — run once to convert notebook into production project
+```
+
+- Uses `import os, textwrap as tw` and `write_file(path, content)` helper
+- `write_file` calls `os.makedirs(os.path.dirname(path) or '.', exist_ok=True)` before every write
+- All content strings: `tw.dedent("""...""").strip() + '\n'`
+- **Never nest triple quotes** — use `'''` for any inner docstrings
+
+**Step 1 — Create directories:**
+```
+src/data/  src/features/  src/models/  src/analytics/  src/reporting/
+config/  data/raw/  data/processed/  models/  reports/  reports/frontend/  notebooks/
+```
+
+**Step 2 — Write `__init__.py`** in `src/` and every `src/` subdirectory.
+
+**Step 3 — Write `config/config.py`** — full CONFIG dict identical to Phase 0.
+
+**Step 4 — Write all 10 src/ modules with FULL production logic:**
+
+| File | Entry-point | Domain-specific must-contain |
+|---|---|---|
+| `src/data/ingest.py` | `load_and_validate(config) -> df` | Read CSV, validate 11 influencer columns, print target balance, return df |
+| `src/data/clean.py` | `clean(df, config) -> df` | dtype enforcement, IQR clip on Follower_Count/Cost/Revenue, add follower_tier + target_numeric, save PROCESSED_CSV |
+| `src/features/engineer.py` | `engineer(df, config) -> df` | All 12 engineered features (roi_ratio through platform_niche_combo), save FEAT_CSV |
+| `src/analytics/eda.py` | `run_eda(df, config) -> None` | Minimum 4 charts: platform ROI rate, engagement vs ROI scatter, cost vs revenue, correlation heatmap |
+| `src/models/classify.py` | `run_classification(df, config) -> df` | FEATURE_COLS list, Gradient Boosting, save roi_classifier.pkl + feature_cols.pkl, add pred_high_roi + pred_roi_probability |
+| `src/models/segment.py` | `run_segmentation(df, config) -> df` | KMeans Gold/Silver/Bronze tiers, IsoForest is_campaign_anomaly, save models, save FEAT_CSV |
+| `src/models/forecast.py` | `run_forecast(df, config) -> dict` | Revenue GBM regressor, save revenue_forecaster.pkl, add predicted_revenue_usd, return {mae, r2, mape} |
+| `src/analytics/business.py` | `run_business_logic(df, config) -> df` | assign_campaign_alerts + assign_partnership_priority + generate_campaign_recommendation, save FEAT_CSV |
+| `src/analytics/insights.py` | `run_insights(df, config) -> None` | 10 insights (all mandatory categories), save insights.json |
+| `src/reporting/export.py` | `export(df, config) -> None` | Plotly dashboard HTML + 8-sheet Excel workbook |
+
+**CRITICAL — Every module must be fully implemented.** No `pass`, no `# TODO`, no stubs.
+Copy the exact logic from the corresponding notebook phase into each module.
+
+**Step 5 — Write `main.py`** using the standard phase-runner pattern from base skill,
+adapted with influencer domain phase names.
+
+**Step 6 — Write root scripts:** `export_for_frontend.py`, `generate_report.py`, `generate_readme.py`
+from their EXPORT_LINES / REPORT_LINES / README_LINES lists.
+
+**Step 7 — Print success summary:**
+```
+Scaffold complete — Influencer Marketing ROI Intelligence Platform
+Directories  : 13
+src/ modules : 10
+Root scripts : 4 (main.py, export_for_frontend.py, generate_report.py, generate_readme.py)
+Models       : 4 (roi_classifier, revenue_forecaster, influencer_segmenter, campaign_anomaly_detector)
+
+Next steps:
+  pip install -r requirements.txt
+  Place raw CSV in data/raw/influencer_campaigns.csv
+  python main.py
+  python export_for_frontend.py    # packages outputs → reports/frontend/ for Cloudflare SaaS
+  open reports/interactive_dashboard.html
+```
+
+---
+
+## CODE QUALITY RULES — enforce every single one
+
+- Single `df_feat` carried forward across all phases after Phase 3
+- Every division: zero denominator guard (`.replace(0, 1)` or `if denom != 0`)
+- Every ML `fit()` call: `assert len(X_tr) >= 20` before fitting
+- Every `values[0]` access: check `len(arr) > 0` first
+- `ANOMALY_CONT = 0.08` hardcoded — never computed via division
+- All charts: saved to `CONFIG['REPORTS_DIR']` with `dpi=150`
+- All models: saved to `CONFIG['MODELS_DIR']` with joblib
+- All file writes: `encoding='utf-8'`
+- No hardcoded column name strings after Phase 0 — always reference `CONFIG[key]`
+- Phase guards: every phase that uses df_feat starts with
+  `if 'df_feat' not in dir(): df_feat = pd.read_csv(CONFIG['FEAT_CSV'])`
+- **Domain-specific guard:** `roi_ratio` must never be used as a feature in the revenue
+  regression model (it contains Revenue in its numerator — data leakage). Use the filtered
+  FEATURE_COLS list that explicitly excludes `roi_ratio` for Phase 7.
+
+---
+
+## REQUIREMENTS.TXT
+
+```python
+REQUIREMENTS = [
+    "pandas", "numpy", "scikit-learn", "matplotlib", "seaborn",
+    "plotly", "openpyxl", "joblib", "notebook", "ipykernel",
+    "xgboost", "lightgbm",
+]
+with open("requirements.txt", "w", encoding="utf-8") as f:
+    f.write("\n".join(REQUIREMENTS) + "\n")
+```
+
+---
+
+## OUTPUT
+
+Deliver **one file**: `generate_notebook.py`
+
+After creating it, present it to the user with:
+```
+✓ generate_notebook.py created
+Run: python generate_notebook.py
+Then: jupyter notebook influencer_roi_analysis.ipynb
+```
+
+No AI prompts in notebook cells. Only `# [NOTE] src/path/to/module.py` comments.

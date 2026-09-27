@@ -1,0 +1,72 @@
+[
+  {
+    "category": "CAMPAIGN_ROI_PREVALENCE",
+    "finding": "96.2% of 208 campaigns delivered High ROI",
+    "evidence": "High ROI: 200 | Low: 8",
+    "action": "Use as baseline for new campaign ROI targets",
+    "severity": "HIGH"
+  },
+  {
+    "category": "BEST_PLATFORM",
+    "finding": "Tiktok leads with 97.0% High ROI rate",
+    "evidence": "{'Instagram': 94.7, 'Tiktok': 97.0, 'Youtube': 96.9}",
+    "action": "Concentrate budget toward Tiktok",
+    "severity": "HIGH"
+  },
+  {
+    "category": "BEST_NICHE",
+    "finding": "Skincare niche delivers highest mean ROI of 10.31x",
+    "evidence": "{'Fashion': 7.54, 'Fitness': 8.25, 'Skincare': 10.31, 'Tech': 6.29}",
+    "action": "Prioritise Skincare niche for premium campaigns",
+    "severity": "HIGH"
+  },
+  {
+    "category": "MICRO_VS_MEGA",
+    "finding": "Mega-influencers outperform by nan ppt",
+    "evidence": "Micro=100.0% | Mega=nan%",
+    "action": "Allocate more budget to Mega-influencers",
+    "severity": "HIGH"
+  },
+  {
+    "category": "ENGAGEMENT_ROI_CORRELATION",
+    "finding": "Engagement-ROI correlation: 0.499",
+    "evidence": "Pearson r=0.499",
+    "action": "Weight composite audience_quality_score over raw engagement rate",
+    "severity": "MEDIUM"
+  },
+  {
+    "category": "COST_EFFICIENCY_FINDING",
+    "finding": "High ROI CPA=$6.95 vs Low ROI CPA=$43.08",
+    "evidence": "Difference: $36.13",
+    "action": "Set $50.0 max CPA in all campaign briefs",
+    "severity": "HIGH"
+  },
+  {
+    "category": "TOP_PLATFORM_NICHE_COMBO",
+    "finding": "Tiktok_Skincare is top combo with mean ROI 12.36x",
+    "evidence": "{'Tiktok_Skincare': 12.36, 'Youtube_Fashion': 9.71, 'Youtube_Fitness': 9.11}",
+    "action": "Create dedicated packages for Tiktok_Skincare partnerships",
+    "severity": "HIGH"
+  },
+  {
+    "category": "ANOMALY_PROFILE",
+    "finding": "17 anomalous campaigns flagged for manual review",
+    "evidence": "Anomaly count=17",
+    "action": "Audit anomalous campaigns for fraud or brief misalignment",
+    "severity": "MEDIUM"
+  },
+  {
+    "category": "GOLD_TIER_PROFILE",
+    "finding": "Gold Tier: 68 influencers | mean ROI 14.08x | mean engagement 8.78%",
+    "evidence": "N=68",
+    "action": "Use Gold Tier profile as recruitment benchmark",
+    "severity": "HIGH"
+  },
+  {
+    "category": "MODEL_PERFORMANCE",
+    "finding": "ROI Prediction Model deployed for pre-spend screening",
+    "evidence": "roi_classifier.pkl trained on 14 features",
+    "action": "Use model to screen new influencers before contract signing",
+    "severity": "MEDIUM"
+  }
+]

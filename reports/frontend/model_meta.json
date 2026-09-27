@@ -1,0 +1,24 @@
+{
+  "model_name": "ROI Classifier",
+  "algorithm": "GradientBoosting",
+  "feature_count": 14,
+  "feature_cols": [
+    "Follower_Count",
+    "Engagement_Rate_Pct",
+    "Avg_Comments_Per_Post",
+    "Past_Brand_Collaborations",
+    "Campaign_Cost_USD",
+    "Discount_Code_Uses",
+    "roi_ratio",
+    "cost_per_discount_use",
+    "revenue_per_follower",
+    "conversion_rate",
+    "engagement_to_cost_efficiency",
+    "audience_quality_score",
+    "influencer_experience_score",
+    "revenue_per_comment"
+  ],
+  "roi_classifier_ready": true,
+  "revenue_forecaster_ready": true,
+  "anomaly_detector_ready": true
+}

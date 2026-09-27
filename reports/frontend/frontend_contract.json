@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-09-27T16:02:49.635657",
+  "pipeline_version": "1.0",
+  "source": {
+    "type": "csv",
+    "file": "data/processed/campaigns_features.csv"
+  },
+  "files": [
+    {
+      "filename": "kpis.json",
+      "purpose": "Top-level scalar KPIs for dashboard header cards"
+    },
+    {
+      "filename": "charts.json",
+      "purpose": "Chart specs for all platform/niche/tier visualisations"
+    },
+    {
+      "filename": "insights.json",
+      "purpose": "Structured marketing intelligence insights feed"
+    },
+    {
+      "filename": "model_meta.json",
+      "purpose": "ML model status and feature metadata"
+    },
+    {
+      "filename": "influencer_tiers.json",
+      "purpose": "Gold/Silver/Bronze tier summary profiles"
+    },
+    {
+      "filename": "platform_performance.json",
+      "purpose": "Per-platform campaign performance breakdown"
+    }
+  ],
+  "forecaster": {
+    "model_file": "models/roi_classifier.pkl",
+    "feature_cols_file": "models/feature_cols.pkl",
+    "output_schema": {
+      "prediction": "int",
+      "probability": "float",
+      "risk_level": "str"
+    }
+  }
+}
