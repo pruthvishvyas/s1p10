@@ -1,0 +1,14 @@
+{
+  "total_campaigns": 208,
+  "high_roi_count": 200,
+  "high_roi_rate": 0.9615,
+  "mean_roi_ratio": 8.4257,
+  "median_campaign_cost_usd": 1576.33,
+  "total_revenue_usd": 2548008.45,
+  "mean_audience_quality_score": 0.3979,
+  "gold_tier_count": 68,
+  "p1_partner_count": 143,
+  "anomaly_count": 17,
+  "roi_classifier_ready": true,
+  "revenue_forecaster_ready": true
+}

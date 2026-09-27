@@ -1,0 +1,26 @@
+[
+  {
+    "platform": "Tiktok",
+    "campaign_count": 100,
+    "high_roi_rate": 0.97,
+    "mean_roi_ratio": 8.763,
+    "mean_cost_usd": 1673.38,
+    "mean_revenue_usd": 12990.49
+  },
+  {
+    "platform": "Youtube",
+    "campaign_count": 32,
+    "high_roi_rate": 0.9688,
+    "mean_roi_ratio": 8.6858,
+    "mean_cost_usd": 1640.15,
+    "mean_revenue_usd": 12044.57
+  },
+  {
+    "platform": "Instagram",
+    "campaign_count": 76,
+    "high_roi_rate": 0.9474,
+    "mean_roi_ratio": 7.8724,
+    "mean_cost_usd": 1682.78,
+    "mean_revenue_usd": 11362.28
+  }
+]

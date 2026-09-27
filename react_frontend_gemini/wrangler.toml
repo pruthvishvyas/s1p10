@@ -1,0 +1,9 @@
+name = "influencer-roi-dashboard"
+main = "src/worker/forecaster.js"
+compatibility_date = "2026-09-27"
+
+[site]
+bucket = "./dist"
+
+[vars]
+INPUT_FIELDS = "Follower_Count,Engagement_Rate_Pct,Avg_Comments_Per_Post,Past_Brand_Collaborations,Campaign_Cost_USD,Discount_Code_Uses,roi_ratio,cost_per_discount_use,revenue_per_follower,conversion_rate,engagement_to_cost_efficiency,audience_quality_score,influencer_experience_score,revenue_per_comment"

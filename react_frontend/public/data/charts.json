@@ -1,0 +1,202 @@
+[
+  {
+    "id": "platform_roi_rates",
+    "title": "ROI Rate by Platform",
+    "type": "bar",
+    "x_label": "Platform",
+    "y_label": "High ROI %",
+    "data": [
+      {
+        "label": "Instagram",
+        "value": 94.74
+      },
+      {
+        "label": "Tiktok",
+        "value": 97.0
+      },
+      {
+        "label": "Youtube",
+        "value": 96.88
+      }
+    ]
+  },
+  {
+    "id": "roi_outcome_distribution",
+    "title": "Campaign ROI Outcome Distribution",
+    "type": "bar",
+    "x_label": "Outcome",
+    "y_label": "Count",
+    "data": [
+      {
+        "label": "Yes",
+        "value": 200
+      },
+      {
+        "label": "No",
+        "value": 8
+      }
+    ]
+  },
+  {
+    "id": "niche_roi_rates",
+    "title": "ROI Rate by Audience Niche",
+    "type": "bar",
+    "x_label": "Niche",
+    "y_label": "High ROI %",
+    "data": [
+      {
+        "label": "Fashion",
+        "value": 97.4
+      },
+      {
+        "label": "Fitness",
+        "value": 92.86
+      },
+      {
+        "label": "Skincare",
+        "value": 98.48
+      },
+      {
+        "label": "Tech",
+        "value": 91.3
+      }
+    ]
+  },
+  {
+    "id": "follower_tier_roi",
+    "title": "ROI Rate by Follower Tier",
+    "type": "bar",
+    "x_label": "Tier",
+    "y_label": "High ROI %",
+    "data": [
+      {
+        "label": "Macro",
+        "value": 95.03
+      },
+      {
+        "label": "Micro",
+        "value": 100.0
+      }
+    ]
+  },
+  {
+    "id": "cost_efficiency_tier_breakdown",
+    "title": "ROI Rate by Cost Efficiency Tier",
+    "type": "bar",
+    "x_label": "Cost Tier",
+    "y_label": "High ROI %",
+    "data": [
+      {
+        "label": "Elite",
+        "value": 100.0
+      },
+      {
+        "label": "Fair",
+        "value": 0.0
+      },
+      {
+        "label": "Good",
+        "value": 20.0
+      }
+    ]
+  },
+  {
+    "id": "partnership_priority_distribution",
+    "title": "Partnership Priority Distribution",
+    "type": "bar",
+    "x_label": "Priority",
+    "y_label": "Count",
+    "data": [
+      {
+        "label": "P1_STRATEGIC_PARTNER",
+        "value": 143
+      },
+      {
+        "label": "P2_RECOMMENDED",
+        "value": 50
+      },
+      {
+        "label": "P3_MONITOR",
+        "value": 11
+      },
+      {
+        "label": "P5_DO_NOT_REBOOK",
+        "value": 3
+      },
+      {
+        "label": "P4_REVIEW_REQUIRED",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "influencer_tier_sizes",
+    "title": "Influencer Tier Sizes",
+    "type": "bar",
+    "x_label": "Tier",
+    "y_label": "Count",
+    "data": [
+      {
+        "label": "Silver Tier",
+        "value": 108
+      },
+      {
+        "label": "Gold Tier",
+        "value": 68
+      },
+      {
+        "label": "Bronze Tier",
+        "value": 32
+      }
+    ]
+  },
+  {
+    "id": "roi_ratio_histogram",
+    "title": "ROI Ratio Distribution",
+    "type": "histogram",
+    "x_label": "ROI Ratio",
+    "y_label": "Count",
+    "data": [
+      {
+        "label": "(0.676, 3.387]",
+        "value": 28
+      },
+      {
+        "label": "(3.387, 6.071]",
+        "value": 51
+      },
+      {
+        "label": "(6.071, 8.755]",
+        "value": 45
+      },
+      {
+        "label": "(8.755, 11.44]",
+        "value": 32
+      },
+      {
+        "label": "(11.44, 14.124]",
+        "value": 26
+      },
+      {
+        "label": "(14.124, 16.808]",
+        "value": 14
+      },
+      {
+        "label": "(16.808, 19.492]",
+        "value": 5
+      },
+      {
+        "label": "(19.492, 22.176]",
+        "value": 2
+      },
+      {
+        "label": "(22.176, 24.86]",
+        "value": 1
+      },
+      {
+        "label": "(24.86, 27.544]",
+        "value": 4
+      }
+    ]
+  }
+]
