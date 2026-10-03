@@ -28,6 +28,7 @@ with 97.0% High ROI rate. Gold Tier influencers deliver 5.5x the ROI of Bronze T
 | High_ROI_Campaign | Target | Whether campaign delivered high ROI (Yes/No) |
 
 ## Project Structure
+```
 ./
   main.py
   README.md
@@ -87,6 +88,7 @@ with 97.0% High ROI rate. Gold Tier influencers deliver 5.5x the ROI of Bronze T
         eda_10_platform_niche_roi_heatmap.png
         interactive_dashboard.html
         manifest.json
+```
 
 ## Pipeline Phases
 0.  Config & Campaign Intelligence Setup — all thresholds and column references
