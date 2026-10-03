@@ -29,13 +29,8 @@ with 97.0% High ROI rate. Gold Tier influencers deliver 5.5x the ROI of Bronze T
 
 ## Project Structure
 ./
-  a.py
-  copy_reports.py
-  export_for_frontend.py
-  export_for_frontend_patch.py
-  generate_readme.py
-  generate_report.py
   main.py
+  README.md
   requirements.txt
   config/
     config.py
@@ -52,8 +47,6 @@ with 97.0% High ROI rate. Gold Tier influencers deliver 5.5x the ROI of Bronze T
     revenue_forecaster.pkl
     roi_classifier.pkl
     seg_scaler.pkl
-  notebooks/
-    influencer_roi_analysis.ipynb
   react_frontend/
     .env
     .env.example
@@ -88,6 +81,12 @@ with 97.0% High ROI rate. Gold Tier influencers deliver 5.5x the ROI of Bronze T
         eda_04_follower_tier_roi.png
         eda_05_engagement_vs_roi_scatter.png
         eda_06_cost_vs_revenue_scatter.png
+        eda_07_audience_quality_by_platform.png
+        eda_08_correlation_heatmap.png
+        eda_09_cost_efficiency_tier_breakdown.png
+        eda_10_platform_niche_roi_heatmap.png
+        interactive_dashboard.html
+        manifest.json
 
 ## Pipeline Phases
 0.  Config & Campaign Intelligence Setup — all thresholds and column references
@@ -100,11 +99,6 @@ with 97.0% High ROI rate. Gold Tier influencers deliver 5.5x the ROI of Bronze T
 7.  Revenue Forecasting — predict campaign revenue (USD)
 8.  Campaign Intelligence Engine — automated alerts, priority tiers, recommendations
 9.  Marketing Intelligence Insights — 10 structured findings with evidence
-10. Dashboard Export — Plotly HTML + 8-sheet Excel workbook
-11. Frontend Export — 7 JSON files for Cloudflare SaaS dashboard
-12. Executive Report Generator — 14-slide boardroom text report
-13. README Generator — this file
-14. Production Scaffolding — full src/ module project structure
 
 ## ML Models
 | Model | Purpose | Algorithm | Status |
