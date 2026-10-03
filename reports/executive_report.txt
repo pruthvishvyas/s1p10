@@ -1,0 +1,114 @@
+SLIDE 1 -- INFLUENCER MARKETING ROI INTELLIGENCE REPORT
+Total campaigns analysed: 208
+Total campaign spend: $347,714.59  |  Total attributed revenue: $2,548,008.45
+Mean ROI ratio across portfolio: 8.43x
+SLIDE 2 -- THE BUSINESS PROBLEM
+Brands allocate large budgets to influencer marketing without a systematic way to predict
+which influencers will deliver high return on investment before committing spend.
+This pipeline replaces intuition-based influencer selection with data-driven ROI prediction,
+automated influencer tier scoring, and a rules-based campaign intelligence engine.
+SLIDE 3 -- CAMPAIGN PORTFOLIO OVERVIEW
+Total campaigns: 208 | High ROI: 200 (96.2%) | Low ROI: 8 (3.799999999999997%)
+Platform mix: Tiktok: 100 | Instagram: 76 | Youtube: 32
+Niche mix: Fashion: 77 | Skincare: 66 | Fitness: 42 | Tech: 23
+Follower tier mix: {'Macro': 161, 'Micro': 47}
+SLIDE 4 -- ROI PERFORMANCE BASELINE
+High ROI rate: 96.2% of all campaigns
+Mean ROI ratio: 8.43x (revenue per dollar spent)
+Top 3 campaigns by ROI ratio:
+     Follower_Count  Campaign_Cost_USD  roi_ratio
+145           71529             842.14  27.544126
+0            112795            1270.04  27.184114
+46            64693             848.17  25.327812
+SLIDE 5 -- PLATFORM PERFORMANCE ANALYSIS
+Best platform by ROI rate: Tiktok (97.0% High ROI campaigns)
+           Campaigns  High_ROI_Rate  Mean_ROI
+Platform                                     
+Instagram         76           94.7      7.87
+Tiktok           100           97.0      8.76
+Youtube           32           96.9      8.69
+SLIDE 6 -- NICHE & AUDIENCE ANALYSIS
+Best niche: Skincare (mean ROI ratio 10.31x)
+                Campaigns  Mean_ROI  High_ROI_Rate
+Audience_Niche                                    
+Skincare               66     10.31           98.5
+Fitness                42      8.25           92.9
+Fashion                77      7.54           97.4
+Tech                   23      6.29           91.3
+SLIDE 7 -- FEATURE ENGINEERING: THE 12 PERFORMANCE SIGNALS
+roi_ratio                    : Revenue/Cost — fundamental campaign efficiency metric
+cost_per_discount_use        : Cost per tracked conversion — spend efficiency
+revenue_per_follower         : Revenue yield per audience member — cuts vanity metrics
+conversion_rate              : % followers who used discount — persuasion power
+engagement_to_cost_efficiency: Engagement x Conversions / Cost — combined quality signal
+audience_quality_score       : Composite 0-1 quality index normalised across platforms
+influencer_experience_score  : Log(collabs) — commercial reliability proxy
+revenue_per_comment          : Comment-to-revenue conversion — intent signal
+cost_efficiency_tier         : Elite/Good/Fair/Poor cost bucket label
+follower_tier                : Micro/Macro/Mega segmentation
+engagement_tier              : Elite/Healthy/Low engagement label
+platform_niche_combo         : Channel x Vertical interaction feature
+SLIDE 8 -- ROI PREDICTION MODEL
+Model ready: True
+Algorithm: Gradient Boosting Classifier (best of LR / RF / GBM by AUC)
+Task: Predict probability of High ROI before campaign spend is committed
+Input: 14 influencer profile and performance features
+Output: Binary High/Low ROI prediction + probability score (0-1)
+Use case: Campaign managers score new influencers before contracting
+SLIDE 9 -- REVENUE FORECASTING MODEL
+Model ready: True
+Algorithm: Gradient Boosting Regressor
+Task: Forecast expected revenue from a campaign given influencer profile and budget
+Key safety: roi_ratio excluded from features to prevent data leakage
+Use case: Budget approval workflow — present predicted revenue range to finance team
+SLIDE 10 -- INFLUENCER TIER MATRIX
+Gold Tier influencers: 68 — highest ROI and audience quality — priority partners
+                 Count  Mean_ROI  Mean_Engagement  Mean_AQ_Score
+influencer_tier                                                 
+Bronze Tier         32     2.543            3.366          0.157
+Gold Tier           68    14.075            8.782          0.570
+Silver Tier        108     6.612            6.465          0.361
+Gold Tier  = prioritise for flagship campaigns and preferred rate negotiations
+Silver Tier = reliable performers for steady-state campaigns
+Bronze Tier = test with small budgets only
+SLIDE 11 -- PARTNERSHIP PRIORITY INTELLIGENCE
+P1 Strategic Partners: 143 influencers — high ROI confirmed + strong engagement
+P1_STRATEGIC_PARTNER  = flagship campaigns + preferred rate negotiation
+P2_RECOMMENDED        = high ROI confirmed or strong eng + low CPA
+P3_MONITOR            = mid-range — watch and re-evaluate after next campaign
+P4_REVIEW_REQUIRED    = negative ROI, expensive conversions, or zero conversions
+P5_DO_NOT_REBOOK      = negative ROI + poor engagement or zero conversions
+partnership_priority
+P1_STRATEGIC_PARTNER    143
+P2_RECOMMENDED           50
+P3_MONITOR               11
+P5_DO_NOT_REBOOK          3
+P4_REVIEW_REQUIRED        1
+SLIDE 12 -- KEY MARKETING INSIGHTS
+CAMPAIGN_ROI_PREVALENCE: 96.2% of 208 campaigns delivered High ROI
+  Evidence: High ROI: 200 | Low: 8
+  Action:   Use as baseline for new campaign ROI targets
+BEST_PLATFORM: Tiktok leads with 97.0% High ROI rate
+  Evidence: {'Instagram': 94.7, 'Tiktok': 97.0, 'Youtube': 96.9}
+  Action:   Concentrate budget toward Tiktok
+BEST_NICHE: Skincare niche delivers highest mean ROI of 10.31x
+  Evidence: {'Fashion': 7.54, 'Fitness': 8.25, 'Skincare': 10.31, 'Tech': 6.29}
+  Action:   Prioritise Skincare niche for premium campaigns
+MICRO_VS_MEGA: Mega-influencers outperform by nan ppt
+  Evidence: Micro=100.0% | Mega=nan%
+  Action:   Allocate more budget to Mega-influencers
+COST_EFFICIENCY_FINDING: High ROI CPA=$6.95 vs Low ROI CPA=$43.08
+  Evidence: Difference: $36.13
+  Action:   Set $50.0 max CPA in all campaign briefs
+SLIDE 13 -- STRATEGIC RECOMMENDATIONS
+1. Concentrate budget on Tiktok — leading platform with 97.0% ROI rate
+2. Prioritise Skincare niche campaigns — highest mean ROI of 10.31x
+3. Use ROI Prediction Model to screen all new influencer proposals before contracting
+4. Set $50 maximum cost-per-conversion KPI in all campaign briefs
+5. Review 17 anomalous campaigns for influencer fraud or brief misalignment
+SLIDE 14 -- TECHNICAL ARCHITECTURE
+Pipeline: 15 phases | Config -> Ingest -> Clean -> Engineer -> EDA -> Classify -> Segment -> Forecast -> Business -> Insights -> Export -> Frontend -> Report -> README -> Scaffold
+Models: ROI Classifier | Revenue Forecaster | Influencer Segmenter | Anomaly Detector
+Outputs: influencer_roi_analysis.ipynb | main.py | export_for_frontend.py
+         generate_report.py | generate_readme.py | reports/ | models/
+SaaS layer: reports/frontend/ -> 7 JSON files -> Cloudflare-hosted dashboard

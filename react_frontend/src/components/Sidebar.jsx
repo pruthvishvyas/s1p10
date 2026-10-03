@@ -1,7 +1,7 @@
 import { useContract } from '../hooks/useContract'
 
-const TABS = ['ROI Overview','Platform Analysis','Influencer Tiers','Campaign Insights','ROI Forecaster','Anomalies']
-const ICONS = ['📊','📡','🏆','💡','🎯','⚠️']
+const TABS = ['ROI Overview','Platform Analysis','Influencer Tiers','Campaign Insights','ROI Forecaster','Anomalies','Visual Reports']
+const ICONS = ['📊','📡','🏆','💡','🎯','⚠️','🖼️']
 
 export default function Sidebar({ activeTab, onTabChange }) {
   const { contract } = useContract()

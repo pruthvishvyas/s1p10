@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import KPICards from '../components/KPICards'
-import ChartPanel from '../components/ChartPanel'
+import Explorer, { PlatformBars } from '../components/Explorer'
 import InsightCards from '../components/InsightCards'
 import TierMatrix from '../components/TierMatrix'
 import PlatformPerformance from '../components/PlatformPerformance'
 import AnomalyTable from '../components/AnomalyTable'
 import Forecaster from '../components/Forecaster'
+import VisualReports from '../components/VisualReports'
 import { EmptyState } from '../components/EmptyState'
 import { useKPIs } from '../hooks/useKPIs'
 import { useCharts } from '../hooks/useCharts'
@@ -15,27 +16,23 @@ import { useTiers } from '../hooks/useTiers'
 import { usePlatforms } from '../hooks/usePlatforms'
 import { useContract } from '../hooks/useContract'
 import { useAnomalies } from '../hooks/useAnomalies'
+import { useReports } from '../hooks/useReports'
 
-const TABS = ['ROI Overview','Platform Analysis','Influencer Tiers','Campaign Insights','ROI Forecaster','Anomalies']
+const TABS = ['ROI Overview','Platform Analysis','Influencer Tiers','Campaign Insights','ROI Forecaster','Anomalies','Visual Reports']
 
 function Spinner() {
   return <div style={{ display:"flex", justifyContent:"center", padding:"var(--space-16)" }}><div style={{ width:36, height:36, border:"3px solid var(--color-border)", borderTop:"3px solid var(--color-primary)", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} /></div>
 }
 
 function ROIOverviewTab() {
-  const { data, loading, error } = useKPIs()
-  const { charts, loading:cl }   = useCharts()
-  if (loading || cl) return <Spinner />
-  if (error) return <EmptyState message={error} icon="⚠️" />
-  return (<><KPICards data={data} /><ChartPanel charts={charts} filter="overview" /></>)
+  return <Explorer />
 }
 
 function PlatformAnalysisTab() {
   const { platforms, loading, error } = usePlatforms()
-  const { charts, loading:cl }        = useCharts()
-  if (loading || cl) return <Spinner />
+  if (loading) return <Spinner />
   if (error) return <EmptyState message={error} icon="⚠️" />
-  return (<><PlatformPerformance platforms={platforms} /><ChartPanel charts={charts} filter="platform" /></>)
+  return (<><PlatformPerformance platforms={platforms} /><PlatformBars platforms={platforms} /></>)
 }
 
 function InfluencerTiersTab() {
@@ -64,16 +61,27 @@ function AnomaliesTab() {
   if (loading) return <Spinner />
   if (error) return (
     <div>
-      <EmptyState
-        message={error}
-        icon="⚠️"
-      />
+      <EmptyState message={error} icon="⚠️" />
       <p style={{ textAlign:"center", fontSize:"var(--text-sm)", color:"var(--color-text-muted)", marginTop:"var(--space-4)" }}>
-        To fix: add anomaly export to <code>export_for_frontend.py</code> — see README for the snippet.
+        Run: <code>python export_for_frontend_patch.py</code> to generate anomalies.json
       </p>
     </div>
   )
   return <AnomalyTable anomalies={anomalies ?? []} />
+}
+
+function VisualReportsTab() {
+  const { reports, loading, error } = useReports()
+  if (loading) return <Spinner />
+  if (error) return (
+    <div>
+      <EmptyState message={error} icon="🖼️" />
+      <p style={{ textAlign:"center", fontSize:"var(--text-sm)", color:"var(--color-text-muted)", marginTop:"var(--space-4)" }}>
+        Run: <code>python export_for_frontend_patch.py</code> to import your pipeline PNG reports.
+      </p>
+    </div>
+  )
+  return <VisualReports reports={reports ?? []} />
 }
 
 const TAB_COMPONENTS = [
@@ -83,6 +91,7 @@ const TAB_COMPONENTS = [
   <CampaignInsightsTab />,
   <ROIForecasterTab />,
   <AnomaliesTab />,
+  <VisualReportsTab />,
 ]
 
 export default function Dashboard() {

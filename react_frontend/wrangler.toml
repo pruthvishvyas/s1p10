@@ -1,6 +1,6 @@
 name = "influencer-roi-dashboard"
 main = "src/worker/forecaster.js"
-compatibility_date = "2026-09-28"
+compatibility_date = "2026-10-03"
 
 [site]
 bucket = "./dist"

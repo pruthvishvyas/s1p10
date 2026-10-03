@@ -255,3 +255,5 @@ tr:hover td { background: rgba(108,63,200,0.02); }
   font-size: var(--text-sm);
   color: var(--color-text-primary);
 }
+/* DRAWER FIX: sidebar was hidden inside the mobile drawer */
+@media (max-width: 767px) { .drawer .sidebar { display: flex !important; width: 100%; border-right: none; } }
